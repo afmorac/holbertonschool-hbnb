@@ -1,0 +1,37 @@
+Testing and Validation Report – HBnB API (Parte 2)
+
+Se realizaron pruebas exhaustivas a todos los endpoints implementados en la API RESTful, incluyendo las rutas de User, Place, Review y Amenity.
+
+Validaciones implementadas:
+
+User:
+first_name, last_name y email no pueden estar vacíos.
+Se verifica que el email tenga un formato válido.
+
+Place:
+title no puede estar vacío.
+price debe ser positivo.
+latitude entre -90 y 90.
+longitude entre -180 y 180.
+owner_id debe existir.
+Si se añaden amenities, sus IDs deben existir.
+
+Review:
+Se valida que comment no esté vacío.
+user_id y place_id deben corresponder a entidades válidas.
+
+Pruebas manuales realizadas:
+
+Se usaron comandos curl para probar los endpoints con:
+Datos válidos (respuesta 201 Created).
+Datos inválidos (respuesta 400 Bad Request).
+Referencias inexistentes (respuesta 404 cuando aplica).
+
+También se accedió a la documentación Swagger en http://127.0.0.1:5000/api/v1/ para verificar los modelos, parámetros y respuestas generadas automáticamente por Flask-RESTx.
+
+Resultados:
+
+Todos los endpoints responden con los códigos correctos.
+Las validaciones muestran errores personalizados al enviar datos inválidos.
+Se probaron múltiples casos exitosos y fallidos.
+La API está lista para ser revisada.
