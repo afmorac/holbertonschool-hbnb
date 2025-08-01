@@ -31,13 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Ejecutar solo si estamos en index.html
+  // Página index.html
   if (document.getElementById('places-list')) {
-    checkAuthentication();
+    checkAuthenticationIndex();
+  }
+
+  // Página place.html
+  if (document.getElementById('place-details')) {
+    checkAuthenticationPlace();
   }
 });
 
-// Función para obtener el valor de una cookie
+// Función para obtener cookies
 function getCookie(name) {
   const cookieArr = document.cookie.split(';');
   for (let cookie of cookieArr) {
@@ -47,8 +52,8 @@ function getCookie(name) {
   return null;
 }
 
-// Verifica si el usuario está autenticado y decide si mostrar el botón login
-function checkAuthentication() {
+// INDEX – Mostrar u ocultar botón Login + lugares
+function checkAuthenticationIndex() {
   const token = getCookie('token');
   const loginLink = document.getElementById('login-link');
 
@@ -60,7 +65,6 @@ function checkAuthentication() {
   }
 }
 
-// Simula datos de lugares (puedes cambiar esto por un fetch real si conectas el backend)
 async function fetchPlaces(token) {
   const places = [
     { name: 'Apartamento en San Juan', price: 50 },
@@ -72,7 +76,6 @@ async function fetchPlaces(token) {
   setupFilter(places);
 }
 
-// Muestra los lugares en la página como tarjetas
 function displayPlaces(places) {
   const placesList = document.getElementById('places-list');
   placesList.innerHTML = '';
@@ -90,7 +93,6 @@ function displayPlaces(places) {
   });
 }
 
-// Filtro de precios
 function setupFilter(places) {
   const filter = document.getElementById('price-filter');
   filter.innerHTML = `
@@ -112,5 +114,65 @@ function setupFilter(places) {
         card.style.display = 'none';
       }
     });
+  });
+}
+
+// PLACE – Mostrar detalles si hay token
+function checkAuthenticationPlace() {
+  const token = getCookie('token');
+  const addReviewSection = document.getElementById('add-review');
+  const placeId = getPlaceIdFromURL();
+
+  if (!token) {
+    addReviewSection.style.display = 'none';
+  } else {
+    addReviewSection.style.display = 'block';
+    fetchPlaceDetails(token, placeId);
+  }
+}
+
+function getPlaceIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id'); // Ejemplo: place.html?id=1
+}
+
+async function fetchPlaceDetails(token, placeId) {
+  // Simulación sin backend
+  const place = {
+    name: 'Apartamento en San Juan',
+    host: 'Carlos Rodríguez',
+    price: 75,
+    description: 'Hermoso apartamento cerca del mar.',
+    amenities: ['WiFi', 'Piscina', 'Aire Acondicionado'],
+    reviews: [
+      { user: 'Ana', comment: 'Muy cómodo', rating: 5 },
+      { user: 'Luis', comment: 'Excelente ubicación', rating: 4 }
+    ]
+  };
+
+  displayPlaceDetails(place);
+}
+
+function displayPlaceDetails(place) {
+  const placeDetails = document.getElementById('place-details');
+  placeDetails.innerHTML = `
+    <div class="place-info">
+      <h2>${place.name}</h2>
+      <p><strong>Anfitrión:</strong> ${place.host}</p>
+      <p><strong>Precio:</strong> $${place.price} por noche</p>
+      <p><strong>Descripción:</strong> ${place.description}</p>
+      <p><strong>Amenidades:</strong> ${place.amenities.join(', ')}</p>
+    </div>
+    <h3>Reseñas:</h3>
+  `;
+
+  place.reviews.forEach(review => {
+    const reviewCard = document.createElement('div');
+    reviewCard.className = 'review-card';
+    reviewCard.innerHTML = `
+      <p><strong>${review.user}</strong> - ⭐ ${review.rating}</p>
+      <p>${review.comment}</p>
+    `;
+    placeDetails.appendChild(reviewCard);
   });
 }
