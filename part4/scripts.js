@@ -40,6 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('place-details')) {
     checkAuthenticationPlace();
   }
+
+  // Página add_review.html
+  if (document.getElementById('review-form')) {
+    checkAuthenticationAddReview();
+  }
 });
 
 // Función para obtener cookies
@@ -137,7 +142,6 @@ function getPlaceIdFromURL() {
 }
 
 async function fetchPlaceDetails(token, placeId) {
-  // Simulación sin backend
   const place = {
     name: 'Apartamento en San Juan',
     host: 'Carlos Rodríguez',
@@ -174,5 +178,48 @@ function displayPlaceDetails(place) {
       <p>${review.comment}</p>
     `;
     placeDetails.appendChild(reviewCard);
+  });
+}
+
+// ADD REVIEW – Validar, enviar review y redirigir si no está logueado
+function checkAuthenticationAddReview() {
+  const token = getCookie('token');
+  if (!token) {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  const placeId = getPlaceIdFromURL();
+  const reviewForm = document.getElementById('review-form');
+
+  reviewForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const reviewText = reviewForm.elements.review.value;
+    const rating = reviewForm.elements.rating.value;
+
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          text: reviewText,
+          rating: parseInt(rating)
+        })
+      });
+
+      if (response.ok) {
+        alert('Review enviada exitosamente');
+        reviewForm.reset();
+      } else {
+        alert('Error al enviar la review');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('No se pudo conectar con el servidor');
+    }
   });
 }
